@@ -21,7 +21,7 @@ function StepOne() {
           <img
             src={stepOneImg}
             alt="Discover Your Style"
-            className=" w-full object-contain mix-blend-multiply"
+            className="w-full h-full object-cover"
           />
         </div>
 

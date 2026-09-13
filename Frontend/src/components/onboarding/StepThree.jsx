@@ -19,12 +19,12 @@ function StepThree() {
 
       <div className="w-full   mx-auto flex flex-col items-center">
         <div className="w-full h-[320px] md:h-[390px] bg-[#f5f5f5] rounded-[28px] flex items-center justify-center mb-10 overflow-hidden">
-          <img
-            src={stepThreeImg}
-            alt="Discover Your Style"
-            className=" w-full object-contain mix-blend-multiply"
-          />
-        </div>
+                  <img
+                    src={stepThreeImg}
+                    alt="Discover Your Style"
+                    className=" w-full object-contain mix-blend-multiply"
+                  />
+                </div>
 
         <div className="text-center mb-8">
           <h1 className="text-[26px] font-bold text-[#111111] mb-2 tracking-tight">
