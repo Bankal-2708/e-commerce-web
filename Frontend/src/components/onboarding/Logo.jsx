@@ -9,15 +9,16 @@ function Logo() {
   useEffect(() => {
     const fadeInTimer = setTimeout(() => {
       setFade(true);
-    }, 50);
+    }, 60);
 
     const fadeOutTimer = setTimeout(() => {
       setFade(false);
-    }, 2400);
+    }, 2200);
 
+    // navigate only AFTER the fade-out transition (900ms) has fully finished
     const navTimer = setTimeout(() => {
       navigate('/step-one');
-    }, 3000);
+    }, 2200 + 900);
 
     return () => {
       clearTimeout(fadeInTimer);
@@ -28,16 +29,17 @@ function Logo() {
 
   return (
     <div
-      className="min-h-screen w-full bg-white flex flex-col items-center justify-center transition-all duration-700 ease-in-out"
+      className="min-h-screen w-full bg-white flex flex-col items-center justify-center"
       style={{
         opacity: fade ? 1 : 0,
-        transform: fade ? 'scale(1)' : 'scale(0.96)',
+        transform: fade ? 'scale(1)' : 'scale(0.97)',
+        transition: 'opacity 900ms cubic-bezier(0.4, 0, 0.2, 1), transform 900ms cubic-bezier(0.4, 0, 0.2, 1)',
       }}
     >
       <img
         src={logoImg}
         alt="Logo"
-        className="w-100 h-auto object-contain transition-transform duration-700"
+        className="w-100 h-auto object-contain"
       />
     </div>
   );
