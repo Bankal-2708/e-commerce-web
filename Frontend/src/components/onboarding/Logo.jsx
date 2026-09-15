@@ -39,7 +39,9 @@ function Logo() {
       <img
         src={logoImg}
         alt="Logo"
-        className="w-100 h-auto object-contain"
+        loading="lazy"
+        decoding="async"
+        className="w-100 h-auto object-contain rounded-2xl"
       />
     </div>
   );

@@ -1,11 +1,13 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import stepOneImg from '../../assets/images/StepOne.jpeg';
+import { motion } from 'framer-motion';
 
 function StepOne() {
   const navigate = useNavigate();
 
   return (
+    
     <div className="min-h-screen w-full bg-white flex flex-col justify-between px-6 md:px-10 py-5">
       <div className="flex justify-end w-full">
         <button
@@ -21,6 +23,8 @@ function StepOne() {
           <img
             src={stepOneImg}
             alt="Discover Your Style"
+            loading="lazy"
+            decoding="async"
             className="w-full h-full object-cover"
           />
         </div>
