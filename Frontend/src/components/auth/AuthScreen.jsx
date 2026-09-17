@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { User, Mail, Lock, Eye, EyeOff, Store } from 'lucide-react';
 import logoImg from '../../assets/images/logo.jpeg';
+import { useAuth } from '../ContextAPI/AuthApi/useAuth'
 
 function AuthScreen() {
+  const { userRole, setUserRole } = useAuth();
   const [activeTab, setActiveTab] = useState('login');
   const [showPassword, setShowPassword] = useState(false);
 
@@ -17,6 +19,8 @@ function AuthScreen() {
     password: '',
     userRole: 'user',
   });
+
+
 
   const isLogin = activeTab === 'login';
 
@@ -51,6 +55,7 @@ function AuthScreen() {
   };
 
   const handleRoleSelect = (role) => {
+    console.log('Role selected:', role);
     setSignupForm((prev) => ({ ...prev, userRole: role }));
   };
 
@@ -58,10 +63,16 @@ function AuthScreen() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    console.log('Current role from Context:', userRole);
+    console.log('Current role from signupForm (Bydefault):', signupForm.userRole);
+
     if (isLogin) {
       console.log('Login Details:', loginForm);
     } else {
+
       console.log('Signup Details:', signupForm);
+      setUserRole(signupForm.userRole);
+      console.log('User role set in context:', signupForm.userRole);
     }
   };
 
