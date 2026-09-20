@@ -5,7 +5,7 @@ import {
   Camera, Calendar, Heart, MessageSquare, Sparkle, Store
 } from 'lucide-react'
 import Card from '../Home/Card'
-import { useAuth } from '../ContextAPI/AuthApi/useAuth'
+import { useAuth } from '../ContextAPI/AuthApi/authUse'
 
 function Home() {
 
@@ -25,7 +25,7 @@ function Home() {
       title: 'Shop with Oryanta 🛍️',
       desc: 'Discover clothes, shoes and fashion products curated for your style.',
       icon: <ShoppingBag size={22} />,
-      path: '/shop',
+      path: '/shopList',
     },
     {
       title: 'My Fashion Profile',
@@ -111,7 +111,7 @@ function Home() {
         </div>
       </div>
 
-          {/* show only when user is seller */}
+      {/* show only when user is seller */}
       {userRole === 'seller' && (
         <div className="px-6 mt-8">
           <h3 className="text-lg font-bold text-gray-900 mb-4">
@@ -121,7 +121,7 @@ function Home() {
             title="Brand Portal 🏪"
             desc="Manage your products and grow your brand on Oryanta."
             icon={<Store size={22} />}
-            dark={true}    
+            dark={true}
             onClick={() => navigate('/brand-portal')}
           />
         </div>

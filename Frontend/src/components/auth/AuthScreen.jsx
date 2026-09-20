@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { User, Mail, Lock, Eye, EyeOff, Store } from 'lucide-react';
 import logoImg from '../../assets/images/logo.jpeg';
-import { useAuth } from '../ContextAPI/AuthApi/useAuth'
+import { useAuth } from '../ContextAPI/AuthApi/authUse';
 
 function AuthScreen() {
   const { userRole, setUserRole } = useAuth();
@@ -17,7 +17,7 @@ function AuthScreen() {
     fullName: '',
     email: '',
     password: '',
-    userRole: 'user',
+    userRole: 'customer', 
   });
 
 
