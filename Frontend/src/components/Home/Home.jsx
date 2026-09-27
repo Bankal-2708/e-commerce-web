@@ -2,14 +2,14 @@ import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Sparkles, ShoppingBag, User, Shirt,
-  Camera, Calendar, Heart, MessageSquare, Sparkle, Store
+  Camera, Calendar, Heart, MessageSquare, Sparkle, Store, LogOut
 } from 'lucide-react'
 import Card from '../Home/Card'
 import { useAuth } from '../ContextAPI/AuthApi/authUse'
 
 function Home() {
 
-  const { userRole } = useAuth()
+  const { user, userRole, logout } = useAuth()
 
   const navigate = useNavigate()
 
@@ -71,21 +71,32 @@ function Home() {
   return (
     <div className="min-h-screen bg-gray-100">
 
-      {/* Header section with title and profile button */}
-
       <div className="flex items-center justify-between px-6 py-4">
         <h1 className="text-xl font-bold tracking-wide text-gray-900">ORYANTA</h1>
-        <button
-          onClick={() => navigate('/profile')}
-          className="p-2 rounded-full hover:bg-gray-200 transition"
-        >
-          <User size={22} className="text-gray-800" />
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => navigate('/profile')}
+            className="p-2 rounded-full hover:bg-gray-200 transition cursor-pointer"
+            title="My Profile"
+          >
+            <User size={22} className="text-gray-800" />
+          </button>
+          <button
+            onClick={async () => {
+              await logout();
+              navigate('/authscreen');
+            }}
+            className="p-2 rounded-full hover:bg-red-50 text-gray-500 hover:text-red-600 transition cursor-pointer"
+            title="Log Out"
+          >
+            <LogOut size={20} />
+          </button>
+        </div>
       </div>
 
       <div className="px-6 pt-2 pb-4">
         <h2 className="text-2xl font-bold text-gray-900">
-          Hey, Style Lover 👋
+          Hey, {user?.fullName ? user.fullName.split(' ')[0] : 'Style Lover'} 👋
         </h2>
         <p className="text-gray-500 text-sm mt-1">
           Let Oryanta help you dress better, every day.
@@ -127,7 +138,7 @@ function Home() {
         </div>
       )}
 
-      {/* footer section with description about Oryanta*/}
+       
 
       <div className="px-6 my-8">
         <div className="bg-gray-100 border border-gray-200 rounded-2xl p-6">

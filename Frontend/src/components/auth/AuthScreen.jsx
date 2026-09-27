@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
-import { User, Mail, Lock, Eye, EyeOff, Store } from 'lucide-react';
+import { User, Mail, Lock, Eye, EyeOff, Store, AlertCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import logoImg from '../../assets/images/logo.jpeg';
 import { useAuth } from '../ContextAPI/AuthApi/authUse';
 
 function AuthScreen() {
-  const { userRole, setUserRole } = useAuth();
+  const { userRole, setUserRole, login, register, loading, error, setError } = useAuth();
+  const navigate = useNavigate();
+
   const [activeTab, setActiveTab] = useState('login');
   const [showPassword, setShowPassword] = useState(false);
+  const [formError, setFormError] = useState('');
 
   const [loginForm, setLoginForm] = useState({
     email: '',
@@ -17,15 +21,15 @@ function AuthScreen() {
     fullName: '',
     email: '',
     password: '',
-    userRole: 'customer', 
+    userRole: 'customer',
   });
-
-
 
   const isLogin = activeTab === 'login';
 
   const handleTabSwitch = (tab) => {
     setActiveTab(tab);
+    setFormError('');
+    if (setError) setError(null);
   };
 
   const togglePasswordVisibility = () => {
@@ -55,26 +59,52 @@ function AuthScreen() {
   };
 
   const handleRoleSelect = (role) => {
-    console.log('Role selected:', role);
     setSignupForm((prev) => ({ ...prev, userRole: role }));
   };
 
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
-    console.log('Current role from Context:', userRole);
-    console.log('Current role from signupForm (Bydefault):', signupForm.userRole);
+    setFormError('');
 
     if (isLogin) {
-      console.log('Login Details:', loginForm);
+      if (!loginForm.email || !loginForm.password) {
+        setFormError('Please enter both email and password.');
+        return;
+      }
+      const res = await login(loginForm.email, loginForm.password);
+      if (res.success) {
+        navigate('/home');
+      } else {
+        setFormError(res.error || 'Login failed. Please check your credentials.');
+      }
     } else {
-
-      console.log('Signup Details:', signupForm);
       setUserRole(signupForm.userRole);
-      console.log('User role set in context:', signupForm.userRole);
+
+      if (!signupForm.fullName || !signupForm.email || !signupForm.password) {
+        setFormError('Please fill in all required fields.');
+        return;
+      }
+      if (signupForm.password.length < 6) {
+        setFormError('Password must be at least 6 characters long.');
+        return;
+      }
+
+      const res = await register({
+        fullName: signupForm.fullName,
+        email: signupForm.email,
+        password: signupForm.password,
+        userRole: signupForm.userRole,
+      });
+
+      if (res.success) {
+        navigate('/home');
+      } else {
+        setFormError(res.error || 'Registration failed. Please try again.');
+      }
     }
   };
+
+  const displayedError = formError || error;
 
   return (
     <div className="min-h-screen w-full bg-white flex flex-col items-center justify-center px-4 py-10 font-sans select-none">
@@ -110,29 +140,37 @@ function AuthScreen() {
           <button
             type="button"
             onClick={() => handleTabSwitch('login')}
-            className={`flex-1 py-3 text-sm font-semibold rounded-xl transition-all duration-300 ${isLogin
-              ? 'bg-black text-white shadow-sm'
-              : 'text-gray-600 hover:text-black'
-              }`}
+            className={`flex-1 py-3 text-sm font-semibold rounded-xl transition-all duration-300 ${
+              isLogin ? 'bg-black text-white shadow-sm' : 'text-gray-600 hover:text-black'
+            }`}
           >
             Login
           </button>
           <button
             type="button"
             onClick={() => handleTabSwitch('signup')}
-            className={`flex-1 py-3 text-sm font-semibold rounded-xl transition-all duration-300 ${!isLogin
-              ? 'bg-black text-white shadow-sm'
-              : 'text-gray-600 hover:text-black'
-              }`}
+            className={`flex-1 py-3 text-sm font-semibold rounded-xl transition-all duration-300 ${
+              !isLogin ? 'bg-black text-white shadow-sm' : 'text-gray-600 hover:text-black'
+            }`}
           >
             Sign Up
           </button>
         </div>
 
+        {displayedError && (
+          <div className="w-full mb-4 px-4 py-3 bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl flex items-center gap-2.5">
+            <AlertCircle className="w-4 h-4 shrink-0 text-red-500" />
+            <span>{displayedError}</span>
+          </div>
+        )}
+
         <form className="w-full flex flex-col gap-4" onSubmit={handleSubmit}>
           <div
-            className={`grid transition-all duration-300 ease-in-out ${!isLogin ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0 pointer-events-none'
-              }`}
+            className={`grid transition-all duration-300 ease-in-out ${
+              !isLogin
+                ? 'grid-rows-[1fr] opacity-100'
+                : 'grid-rows-[0fr] opacity-0 pointer-events-none'
+            }`}
           >
             <div className="overflow-hidden">
               <div className="w-full flex items-center bg-white border border-gray-100 rounded-2xl px-5 py-4 shadow-[0_1px_4px_rgba(0,0,0,0.04)] focus-within:border-gray-300">
@@ -171,7 +209,7 @@ function AuthScreen() {
             <button
               type="button"
               onClick={togglePasswordVisibility}
-              className="text-gray-500 hover:text-black ml-2 focus:outline-none"
+              className="text-gray-500 hover:text-black ml-2 focus:outline-none cursor-pointer"
             >
               {showPassword ? (
                 <EyeOff className="w-5 h-5" strokeWidth={1.8} />
@@ -182,8 +220,11 @@ function AuthScreen() {
           </div>
 
           <div
-            className={`grid transition-all duration-300 ease-in-out ${!isLogin ? 'grid-rows-[1fr] opacity-100 mt-2' : 'grid-rows-[0fr] opacity-0 pointer-events-none mt-0'
-              }`}
+            className={`grid transition-all duration-300 ease-in-out ${
+              !isLogin
+                ? 'grid-rows-[1fr] opacity-100 mt-2'
+                : 'grid-rows-[0fr] opacity-0 pointer-events-none mt-0'
+            }`}
           >
             <div className="overflow-hidden">
               <div className="text-left pb-1">
@@ -193,20 +234,23 @@ function AuthScreen() {
                 <div className="grid grid-cols-2 gap-3.5">
                   <div
                     onClick={() => handleRoleSelect('customer')}
-                    className={`cursor-pointer rounded-2xl p-4 md:p-5 border transition-all duration-200 ${signupForm.userRole === 'customer'
-                      ? 'bg-black text-white border-black shadow-sm'
-                      : 'bg-white text-gray-800 border-gray-100 hover:border-gray-200'
-                      }`}
+                    className={`cursor-pointer rounded-2xl p-4 md:p-5 border transition-all duration-200 ${
+                      signupForm.userRole === 'customer'
+                        ? 'bg-black text-white border-black shadow-sm'
+                        : 'bg-white text-gray-800 border-gray-100 hover:border-gray-200'
+                    }`}
                   >
                     <User
-                      className={`w-5 h-5 mb-3.5 ${signupForm.userRole === 'customer' ? 'text-white' : 'text-gray-800'
-                        }`}
+                      className={`w-5 h-5 mb-3.5 ${
+                        signupForm.userRole === 'customer' ? 'text-white' : 'text-gray-800'
+                      }`}
                       strokeWidth={1.8}
                     />
                     <p className="text-sm font-bold leading-tight">Fashion User</p>
                     <p
-                      className={`text-xs mt-1 ${signupForm.userRole === 'customer' ? 'text-gray-300' : 'text-gray-400'
-                        }`}
+                      className={`text-xs mt-1 ${
+                        signupForm.userRole === 'customer' ? 'text-gray-300' : 'text-gray-400'
+                      }`}
                     >
                       Discover & style
                     </p>
@@ -214,20 +258,23 @@ function AuthScreen() {
 
                   <div
                     onClick={() => handleRoleSelect('seller')}
-                    className={`cursor-pointer rounded-2xl p-4 md:p-5 border transition-all duration-200 ${signupForm.userRole === 'seller'
-                      ? 'bg-black text-white border-black shadow-sm'
-                      : 'bg-white text-gray-800 border-gray-100 hover:border-gray-200'
-                      }`}
+                    className={`cursor-pointer rounded-2xl p-4 md:p-5 border transition-all duration-200 ${
+                      signupForm.userRole === 'seller'
+                        ? 'bg-black text-white border-black shadow-sm'
+                        : 'bg-white text-gray-800 border-gray-100 hover:border-gray-200'
+                    }`}
                   >
                     <Store
-                      className={`w-5 h-5 mb-3.5 ${signupForm.userRole === 'seller' ? 'text-white' : 'text-gray-800'
-                        }`}
+                      className={`w-5 h-5 mb-3.5 ${
+                        signupForm.userRole === 'seller' ? 'text-white' : 'text-gray-800'
+                      }`}
                       strokeWidth={1.8}
                     />
                     <p className="text-sm font-bold leading-tight">Brand / Seller</p>
                     <p
-                      className={`text-xs mt-1 ${signupForm.userRole === 'seller' ? 'text-gray-300' : 'text-gray-400'
-                        }`}
+                      className={`text-xs mt-1 ${
+                        signupForm.userRole === 'seller' ? 'text-gray-300' : 'text-gray-400'
+                      }`}
                     >
                       Sell on Oryanta
                     </p>
@@ -239,14 +286,25 @@ function AuthScreen() {
 
           <button
             type="submit"
-            className="w-full bg-black hover:bg-neutral-900 text-white font-semibold py-4 rounded-2xl transition-all duration-200 active:scale-[0.99] text-sm md:text-base mt-2 shadow-sm"
+            disabled={loading}
+            className="w-full bg-black hover:bg-neutral-900 disabled:bg-gray-400 text-white font-semibold py-4 rounded-2xl transition-all duration-200 active:scale-[0.99] text-sm md:text-base mt-2 shadow-sm cursor-pointer disabled:cursor-not-allowed"
           >
-            {isLogin ? 'Login' : 'Create Account'}
+            {loading ? (
+              <span className="flex items-center justify-center gap-2">
+                <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                {isLogin ? 'Logging in...' : 'Creating Account...'}
+              </span>
+            ) : (
+              isLogin ? 'Login' : 'Create Account'
+            )}
           </button>
 
           <div
-            className={`grid transition-all duration-300 ease-in-out ${!isLogin ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0 pointer-events-none'
-              }`}
+            className={`grid transition-all duration-300 ease-in-out ${
+              !isLogin
+                ? 'grid-rows-[1fr] opacity-100'
+                : 'grid-rows-[0fr] opacity-0 pointer-events-none'
+            }`}
           >
             <div className="overflow-hidden">
               <p className="text-xs text-gray-400 text-center mt-3">

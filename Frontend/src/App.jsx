@@ -1,5 +1,8 @@
 import React, { Suspense, lazy } from 'react';
 import { Route, Routes } from 'react-router-dom';
+import ProfileSet from './components/Home/Pages/profileSet.jsx';
+// import AddProduct from './components/Home/Pages/addProduct.jsx';
+// import BrandPortal from './components/Home/Pages/brandPortal.jsx';
 
 // Dynamic lazy imports
 const Logo = lazy(() => import('./components/onboarding/Logo'));
@@ -13,6 +16,8 @@ const Profile = lazy(() => import('./components/Home/Pages/profileSet.jsx'));
 const Wardrobe = lazy(() => import('./components/Home/Pages/wardrobe.jsx'));
 const TryOn = lazy(() => import('./components/Home/Pages/tryOn.jsx'));
 const Planner = lazy(() => import('./components/Home/Pages/planner.jsx'));
+const BrandPortal = lazy(() => import('./components/Home/Pages/brandPortal.jsx'));
+const AddProduct = lazy(()=> import('./components/Home/Pages/addProduct.jsx'));
 
 
 function PageLoader() {
@@ -35,10 +40,13 @@ function App() {
           <Route path="/authscreen" element={<AuthScreen />} />
           <Route path="/home" element={<Home />} />
           <Route path="/shopList" element={<ShopList />} />
-          <Route pth="/profile" element={<Profile />} />
+          { /*<Route path="/profile" element={<Profile />} /> */}
           <Route path="/wardrobe" element={<Wardrobe />} />
-          <Route path="/try-on" element={<TryOn />} />                                    
+          <Route path="/try-on" element={<TryOn />} />
           <Route path="/planner" element={<Planner />} />
+          <Route path="/profile" element={<ProfileSet />} />
+          <Route path="/brand-portal" element={<BrandPortal />} />
+          <Route path="/addProduct" element={<AddProduct/>} />
         </Routes>
       </Suspense>
     </div>
