@@ -27,7 +27,6 @@ function ProfileSet() {
           <div className="w-9" />
         </div>
 
-
         <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm mb-6 flex flex-col items-center text-center">
           <div className="w-20 h-20 rounded-full bg-gray-900 text-white flex items-center justify-center text-2xl font-bold mb-4 shadow-sm">
             {user?.fullName ? user.fullName.charAt(0).toUpperCase() : 'U'}
@@ -42,7 +41,6 @@ function ProfileSet() {
             {userRole || user?.userRole || 'Customer'}
           </span>
         </div>
-
 
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm divide-y divide-gray-100 mb-6">
           <div className="flex items-center px-5 py-4">
@@ -75,7 +73,6 @@ function ProfileSet() {
             </div>
           </div>
         </div>
-
 
         <button
           onClick={handleLogout}

@@ -17,7 +17,6 @@ function Card({ title, desc, icon, dark, onClick }) {
       >
         {icon}
       </div>
-
       
       <div className="flex-1">
         <h4 className="font-semibold text-base">{title}</h4>

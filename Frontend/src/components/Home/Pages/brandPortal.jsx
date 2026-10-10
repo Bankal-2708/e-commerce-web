@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Package, ArrowLeft, Trash2, Edit } from 'lucide-react';
+import { Plus, Package, ArrowLeft, Trash2, Edit, AlertTriangle } from 'lucide-react';
 
 const API = '/api';
 
- 
 const apiCall = (url, options = {}) =>
   fetch(`${API}${url}`, { credentials: 'include', ...options }).then((res) => res.json());
 
@@ -14,6 +13,10 @@ function BrandPortal() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  // Delete item state
+  const [deleteId, setDeleteId] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
   useEffect(() => {
     fetchMyProducts();
   }, []);
@@ -22,7 +25,9 @@ function BrandPortal() {
     setLoading(true);
     try {
       const data = await apiCall('/products/seller/me');
-      data.success ? setProducts(data.products) : setError(data.message || 'Failed to load products');
+      data.success
+        ? setProducts(data.products)
+        : setError(data.message || 'Failed to load products');
     } catch {
       setError('Could not connect to server');
     } finally {
@@ -30,13 +35,24 @@ function BrandPortal() {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('Delete this product?')) return;
+
+  const handleDeleteClick = (id) => setDeleteId(id);
+
+  // cancle delete modal
+  const handleCancel = () => setDeleteId(null);
+
+  // Confirm delete function
+  const handleConfirmDelete = async () => {
+    if (!deleteId) return;
+    setIsDeleting(true);
     try {
-      await apiCall(`/products/${id}`, { method: 'DELETE' });
+      await apiCall(`/products/${deleteId}`, { method: 'DELETE' });
+      setDeleteId(null);
       fetchMyProducts();
     } catch (err) {
       console.error(err);
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -44,11 +60,17 @@ function BrandPortal() {
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center justify-between mb-6">
-          <button onClick={() => navigate('/home')} className="p-2 rounded-xl bg-white border border-gray-200 hover:bg-gray-100 transition">
+          <button
+            onClick={() => navigate('/home')}
+            className="p-2 rounded-xl bg-white border border-gray-200 hover:bg-gray-100 transition cursor-pointer"
+          >
             <ArrowLeft className="w-5 h-5 text-gray-700" />
           </button>
           <h1 className="text-xl font-bold text-gray-900">Brand Portal 🏪</h1>
-          <button onClick={() => navigate('/addProduct')} className="bg-black text-white px-4 py-2 rounded-xl flex items-center gap-2 hover:bg-gray-800 transition">
+          <button
+            onClick={() => navigate('/addProduct')}
+            className="bg-black text-white px-4 py-2 rounded-xl flex items-center gap-2 hover:bg-gray-800 transition cursor-pointer"
+          >
             <Plus size={18} /> Add Product
           </button>
         </div>
@@ -65,15 +87,23 @@ function BrandPortal() {
           <div className="bg-white rounded-2xl p-12 text-center border border-gray-100">
             <Package className="w-14 h-14 mx-auto text-gray-300 mb-4" />
             <h3 className="font-semibold text-gray-800 text-lg">No products yet</h3>
-            <p className="text-gray-500 text-sm mt-1 mb-6">Add your first product to start selling on Oryanta.</p>
-            <button onClick={() => navigate('/addProduct')} className="bg-black text-white px-6 py-3 rounded-xl font-semibold hover:bg-gray-800 transition">
+            <p className="text-gray-500 text-sm mt-1 mb-6">
+              Add your first product to start selling on Oryanta.
+            </p>
+            <button
+              onClick={() => navigate('/addProduct')}
+              className="bg-black text-white px-6 py-3 rounded-xl font-semibold hover:bg-gray-800 transition cursor-pointer"
+            >
               + Add Your First Product
             </button>
           </div>
         ) : (
           <div className="grid gap-4">
             {products.map((p) => (
-              <div key={p._id} className="bg-white rounded-2xl p-4 border border-gray-100 flex gap-4 items-center">
+              <div
+                key={p._id}
+                className="bg-white rounded-2xl p-4 border border-gray-100 flex gap-4 items-center"
+              >
                 <img
                   src={p.images?.[0] || '/placeholder.png'}
                   alt={p.name}
@@ -84,16 +114,25 @@ function BrandPortal() {
                   <h3 className="font-semibold text-gray-900 truncate">{p.name}</h3>
                   <p className="text-sm text-gray-500 truncate">{p.description}</p>
                   <div className="flex items-center gap-3 mt-2 flex-wrap">
-                    <span className="font-bold text-gray-900">₹{p.price}</span>
+                    <span className="font-semibold text-gray-900">₹{p.price}</span>
+                    <span className='text-sm line-through text-gray-600'>₹{p.discountPrice + p.price} </span>
                     <span className="text-xs text-gray-500">Sizes: {p.sizes?.join(', ')}</span>
                     <span className="text-xs text-gray-400">Stock: {p.stock}</span>
                   </div>
                 </div>
                 <div className="flex gap-2 shrink-0">
-                  <button onClick={() => navigate(`/brand-portal/edit/${p._id}`)} className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition" title="Edit">
+                  <button
+                    onClick={() => navigate(`/editProduct/${p._id}`)}
+                    className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition cursor-pointer"
+                    title="Edit"
+                  >
                     <Edit size={16} className="text-gray-700" />
                   </button>
-                  <button onClick={() => handleDelete(p._id)} className="p-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition" title="Delete">
+                  <button
+                    onClick={() => handleDeleteClick(p._id)}
+                    className="p-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition cursor-pointer"
+                    title="Delete"
+                  >
                     <Trash2 size={16} />
                   </button>
                 </div>
@@ -102,6 +141,53 @@ function BrandPortal() {
           </div>
         )}
       </div>
+
+      {/* confirmation pop up menu for deleting the item */}
+      {deleteId && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+          onClick={handleCancel}
+        >
+          <div
+            className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 modal-pop"
+            onClick={(e) => e.stopPropagation()}
+          >
+
+            <div className="flex items-center justify-center w-16 h-16 rounded-full bg-red-100 mx-auto mb-5">
+              <AlertTriangle className="w-8 h-8 text-red-600" strokeWidth={2.2} />
+            </div>
+
+
+            <h3 className="text-lg font-bold text-gray-900 text-center mb-2">
+              Delete this product?
+            </h3>
+
+
+            <p className="text-sm text-gray-500 text-center mb-7 leading-relaxed">
+              This action cannot be undone. The product will be permanently
+              removed from your store.
+            </p>
+
+
+            <div className="flex gap-3">
+              <button
+                onClick={handleCancel}
+                disabled={isDeleting}
+                className="flex-1 py-3 rounded-xl border border-gray-300 font-semibold text-gray-700 hover:bg-gray-50 transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmDelete}
+                disabled={isDeleting}
+                className="flex-1 py-3 rounded-xl bg-red-600 text-white font-semibold hover:bg-red-700 transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isDeleting ? 'Deleting...' : 'Delete'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

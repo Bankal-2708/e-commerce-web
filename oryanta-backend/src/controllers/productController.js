@@ -165,7 +165,7 @@ export const updateProduct = async (req, res) => {
     }
 
     const updated = await Product.findByIdAndUpdate(req.params.id, updateData, {
-      new: true,
+      returnDocument: 'after',
       runValidators: true,
     });
 

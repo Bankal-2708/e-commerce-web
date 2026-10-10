@@ -7,7 +7,7 @@ function StepOne() {
   const navigate = useNavigate();
 
   return (
-    
+
     <div className="min-h-screen w-full bg-white flex flex-col justify-between px-6 md:px-10 py-5">
       <div className="flex justify-end w-full">
         <button

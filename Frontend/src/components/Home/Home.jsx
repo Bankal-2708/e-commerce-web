@@ -31,7 +31,7 @@ function Home() {
       title: 'My Fashion Profile',
       desc: 'Save your skin tone, body shape, height and personal fashion style.',
       icon: <User size={22} />,
-      path: '/profile',
+      path: '/fashionProfile',
     },
   ]
 
@@ -70,7 +70,6 @@ function Home() {
 
   return (
     <div className="min-h-screen bg-gray-100">
-
       <div className="flex items-center justify-between px-6 py-4">
         <h1 className="text-xl font-bold tracking-wide text-gray-900">ORYANTA</h1>
         <div className="flex items-center gap-2">
@@ -137,8 +136,6 @@ function Home() {
           />
         </div>
       )}
-
-       
 
       <div className="px-6 my-8">
         <div className="bg-gray-100 border border-gray-200 rounded-2xl p-6">
