@@ -50,7 +50,7 @@ userSchema.methods.comparePassword = async function (candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
 };
 
-// Ensure password is never serialized in toJSON
+
 userSchema.set('toJSON', {
   transform: (doc, ret) => {
     delete ret.password;
@@ -59,4 +59,4 @@ userSchema.set('toJSON', {
 });
 
 export const User = mongoose.model('User', userSchema);
-export default User;
+// export default User;
